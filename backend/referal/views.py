@@ -7,7 +7,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response  # Не забудьте импортировать Response
 
-from referal.models import AuthSession
+from referal.models import AuthSession, User
+
 
 
 # Create your views here.
@@ -65,6 +66,8 @@ class VerifyCodeView(APIView):
         if auth_code_from_db and user_auth_code == auth_code_from_db.code:
                 auth_code_from_db.is_used = True
                 auth_code_from_db.save()
+                User(phone_number=phone_number, ).save()
+
                 return Response({
                                     "message": f"Авторизация пройдена успешно {phone_number}. {auth_code_from_db.code}, {auth_code_from_db.expires_at}"})
         else:

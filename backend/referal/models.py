@@ -35,7 +35,7 @@ class User(models.Model):
 
 class AuthSession(models.Model):
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
-    code = models.CharField(max_length=10, verbose_name="Код подтверждения")
+    code = models.CharField(max_length=4, verbose_name="Код подтверждения")
     expires_at = models.DateTimeField(verbose_name="Срок действия")
     is_used = models.BooleanField(default=False, verbose_name="Использован")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
