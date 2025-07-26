@@ -66,8 +66,8 @@ class AuthSessionModel(models.Model):
 
 class InviteCodeModel(models.Model):
     code = models.CharField(max_length=10, unique=True, verbose_name="Инвайт-код")
-    user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='own_invite_code',
-                                verbose_name="Пользователь")
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='own_invite_code',
+                               verbose_name="Пользователь" )
     is_active = models.BooleanField(default=True, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
@@ -83,7 +83,7 @@ class InviteCodeModel(models.Model):
         """Генерация уникального 6-значного инвайт-кода"""
         while True:
             code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-            if not InviteCodeModel.objects.filter(code=code, is_active=True).exists():
+            if not InviteCodeModel.objects.filter(code=code).exists():
                 return code
 
     def __str__(self):

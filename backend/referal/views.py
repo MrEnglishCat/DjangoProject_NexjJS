@@ -72,11 +72,12 @@ class VerifyCodeView(APIView):
             auth_code_from_db.is_used = True
             invite_code = InviteCodeModel.generate_unique_code()
             user, create = UserModel.objects.get_or_create(phone_number=phone_number )
-            try:
-                _invite_code_obj, create = InviteCodeModel.objects.get_or_create(code=invite_code, user_id=user.id )
-                InviteCodeUsageModel.objects.get_or_create(invite_code=_invite_code_obj, user_id=user.id )
-            except IntegrityError:
-                _invite_code = InviteCodeModel.objects.get(user_id=user.id, )
+            if not (InviteCodeModel.objects.filter(user_id=user.id, is_active=True)):
+                try:
+                    _invite_code_obj, create = InviteCodeModel.objects.get_or_create(code=invite_code, user_id=user.id, is_active=True )
+                    InviteCodeUsageModel.objects.get_or_create(invite_code=_invite_code_obj, user_id=user.id )
+                except IntegrityError:
+                    _invite_code = InviteCodeModel.objects.get(user_id=user.id, )
 
             auth_code_from_db.save()
 
