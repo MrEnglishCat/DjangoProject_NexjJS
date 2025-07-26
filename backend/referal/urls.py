@@ -9,7 +9,7 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('invite_code/', InviteCodeView.as_view(), name='invite_code'),
     path('mobile_login/', RequestCodeView.as_view(), name='register'),
-    path('verify_login/', VerifyCodeView.as_view(), name='verify'),
+    path('verify_code/', VerifyCodeView.as_view(), name='verify'),
     path('get_user_profile/', UserProfileView.as_view(), name='get_user_profile'),
 
 

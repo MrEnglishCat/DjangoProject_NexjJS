@@ -60,6 +60,8 @@ class VerifyCodeView(APIView):
     def post(self, request):
         phone_number = ''.join(re.findall(r"\d+", request.data.get('phone_number', '')))
         user_auth_code = request.data.get('auth_code')
+
+        print(phone_number, user_auth_code)
         if not phone_number or not user_auth_code:
             return Response({"message": "Не передан номер телефона или код авторизации!"},
                             status=status.HTTP_400_BAD_REQUEST)
