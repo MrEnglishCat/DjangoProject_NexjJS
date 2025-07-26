@@ -83,7 +83,7 @@ class InviteCodeModel(models.Model):
         """Генерация уникального 6-значного инвайт-кода"""
         while True:
             code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-            if not InviteCodeModel.objects.filter(code=code).exists():
+            if not InviteCodeModel.objects.filter(code=code, is_active=True).exists():
                 return code
 
     def __str__(self):

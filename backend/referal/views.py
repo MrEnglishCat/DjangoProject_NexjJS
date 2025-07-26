@@ -76,7 +76,7 @@ class VerifyCodeView(APIView):
                 _invite_code_obj, create = InviteCodeModel.objects.get_or_create(code=invite_code, user_id=user.id )
                 InviteCodeUsageModel.objects.get_or_create(invite_code=_invite_code_obj, user_id=user.id )
             except IntegrityError:
-                _invite_code = InviteCodeModel.objects.get(user_id=user.id )
+                _invite_code = InviteCodeModel.objects.get(user_id=user.id, )
 
             auth_code_from_db.save()
 
