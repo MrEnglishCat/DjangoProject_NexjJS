@@ -101,5 +101,4 @@ class UserProfileView(APIView):
             _invite_code_usage = user.activated_invites.all()
         except UserModel.DoesNotExist:
             return Response({"success":False, "message": "Пользователь не найден!"}, status=status.HTTP_204_NO_CONTENT)
-        # return Response({"success":True, "user":UserProfileSerializer(user).data, "invite_codes": [InviteCodeUsageSerializer(item).data for item in _invite_code_usage]}, status=status.HTTP_200_OK)
         return Response({"success":True, "user":UserProfileSerializer(user).data, "invite_codes": InviteCodeUsageSerializer(_invite_code_usage, many=True).data}, status=status.HTTP_200_OK)
