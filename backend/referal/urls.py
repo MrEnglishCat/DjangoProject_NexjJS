@@ -3,14 +3,10 @@ from django.urls import path, include, re_path
 from referal.views import InviteCodeView, RequestCodeView, VerifyCodeView, UserProfileView
 
 urlpatterns = [
-    # path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    # path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    # path('admin/', admin.site.urls),
     path('invite_code/', InviteCodeView.as_view(), name='invite_code'),
     path('mobile_login/', RequestCodeView.as_view(), name='register'),
     path('verify_code/', VerifyCodeView.as_view(), name='verify'),
-    path('get_user_profile/', UserProfileView.as_view(), name='get_user_profile'),
+    path('user_profile/<str:phone_number>/', UserProfileView.as_view(), name='user_profile'),
 
 
 ]
