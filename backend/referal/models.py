@@ -5,11 +5,11 @@ import random
 import string
 
 
-class User(models.Model):
+class UserModel(models.Model):
     phone_number = models.CharField(max_length=20, unique=True, verbose_name="Номер телефона")
     username = models.CharField(max_length=30, verbose_name="Username")
     first_name = models.CharField(max_length=50, verbose_name="Имя")
-    # invite_code = models.CharField(max_length=10, unique=True, verbose_name="Инвайт-код")
+    # invite_code = models.CharField(max_length=6, unique=True, verbose_name="Инвайт-код")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
@@ -17,23 +17,24 @@ class User(models.Model):
     #     if not self.invite_code:
     #         self.invite_code = self.generate_invite_code()
     #     super().save(*args, **kwargs)
-
+    #
     # def generate_invite_code(self):
     #     """Генерация уникального 6-значного инвайт-кода"""
     #     while True:
     #         code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-    #         if not User.objects.filter(invite_code=code).exists():
+    #         if not UserModel.objects.filter(invite_code=code).exists():
     #             return code
 
     def __str__(self):
-        return f"{self.phone_number} ({self.invite_code})"
+        # return f"{self.phone_number} ({self.invite_code})"
+        return f"UserModel({self.phone_number}, {self.username}, {self.first_name}, {self.created_at}, {self.updated_at})"
 
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
 
-class AuthSession(models.Model):
+class AuthSessionModel(models.Model):
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
     code = models.CharField(max_length=4, verbose_name="Код подтверждения")
     expires_at = models.DateTimeField(verbose_name="Срок действия")
@@ -63,9 +64,9 @@ class AuthSession(models.Model):
         verbose_name_plural = "Сессии авторизации"
 
 
-class InviteCode(models.Model):
+class InviteCodeModel(models.Model):
     code = models.CharField(max_length=10, unique=True, verbose_name="Инвайт-код")
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='own_invite_code',
+    user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='own_invite_code',
                                 verbose_name="Пользователь")
     is_active = models.BooleanField(default=True, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -76,11 +77,13 @@ class InviteCode(models.Model):
             self.code = self.generate_unique_code()
         super().save(*args, **kwargs)
 
+
+    @classmethod
     def generate_unique_code(self):
         """Генерация уникального 6-значного инвайт-кода"""
         while True:
             code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-            if not InviteCode.objects.filter(code=code).exists():
+            if not InviteCodeModel.objects.filter(code=code).exists():
                 return code
 
     def __str__(self):
@@ -91,10 +94,10 @@ class InviteCode(models.Model):
         verbose_name_plural = "Инвайт-коды"
 
 
-class InviteCodeUsage(models.Model):
-    invite_code = models.ForeignKey(InviteCode, on_delete=models.CASCADE, related_name='usages',
+class InviteCodeUsageModel(models.Model):
+    invite_code = models.ForeignKey(InviteCodeModel, on_delete=models.CASCADE, related_name='usages',
                                     verbose_name="Инвайт-код")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activated_invites',
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='activated_invites',
                              verbose_name="Пользователь")
     used_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата активации")
     is_revoked = models.BooleanField(default=False, verbose_name="Отозван")
@@ -103,6 +106,6 @@ class InviteCodeUsage(models.Model):
         return f"{self.user.phone_number} -> {self.invite_code.code}"
 
     class Meta:
-        unique_together = ['user']  # Каждый пользователь может активировать только один код
+        # unique_together = ['user']  # Каждый пользователь может активировать только один код
         verbose_name = "Использование инвайт-кода"
         verbose_name_plural = "Использования инвайт-кодов"

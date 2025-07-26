@@ -1,7 +1,6 @@
 from django.urls import path, include, re_path
 
-from referal.views import InviteCodeView, RequestCodeView, VerifyCodeView
-
+from referal.views import InviteCodeView, RequestCodeView, VerifyCodeView, UserProfileView
 
 urlpatterns = [
     # path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
@@ -11,6 +10,7 @@ urlpatterns = [
     path('invite_code/', InviteCodeView.as_view(), name='invite_code'),
     path('mobile_login/', RequestCodeView.as_view(), name='register'),
     path('verify_login/', VerifyCodeView.as_view(), name='verify'),
+    path('get_user_profile/', UserProfileView.as_view(), name='get_user_profile'),
 
 
 ]
