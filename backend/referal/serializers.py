@@ -30,6 +30,55 @@ class InviteCodeSerializer(ModelSerializer):
         model = InviteCodeModel
         fields = ["invite_code", "is_active", "user", "created_at", "updated_at"]
 
+class ActivateInviteCodeSerializer(serializers.Serializer):
+
+    invite_code = serializers.CharField(max_length=6, min_length=6, required=True)
+    user_id = serializers.IntegerField()
+
+    def validate_invite_code(self, value):
+        try:
+            _invite_code_obj = InviteCodeModel.objects.get(invite_code=value)
+            print("serializer", _invite_code_obj)
+            return value
+        except InviteCodeModel.DoesNotExist:
+            raise serializers.ValidationError("Неверный инвайт код!")
+
+    def validate_user_id(self, value):
+        try:
+            _user_obj = UserModel.objects.get(id=value)
+            print("serializer", _user_obj)
+            return value
+        except UserModel.DoesNotExist:
+            raise serializers.ValidationError("Пользователь не найден!")
+
+    def validate(self, attrs):
+        print("attrs", attrs)
+        invite_code = attrs["invite_code"]
+        user_id = attrs["user_id"]
+        if invite_code is None:
+            raise serializers.ValidationError({"invite_code": "Это поле обязательно для заполнения."})
+        if user_id is None:
+            raise serializers.ValidationError({"user_id": "Это поле обязательно для заполнения."})
+
+        try:
+            _invite_code_obj = InviteCodeModel.objects.get(invite_code=invite_code)
+            if _invite_code_obj.user and _invite_code_obj.user.id == user_id:
+                raise serializers.ValidationError("Нельзя повторно активировать свой собственный код!")
+            elif _invite_code_obj.user and _invite_code_obj.user.id != user_id:
+                user_instance = UserModel.objects.get(id=user_id)
+                invite_obj = InviteCodeUsageModel.objects.get_or_create(
+                    invite_code=_invite_code_obj,
+                    user=user_instance,
+                )
+
+                print(invite_obj)
+
+                raise serializers.ValidationError("Попытка активации чужого инвайт-кода! Данные сохранены!")
+        except InviteCodeModel.DoesNotExist:
+            ...
+
+        return attrs
+
 
 class InviteCodeUsageSerializer(ModelSerializer):
     user_phone_number = serializers.CharField(source='user.phone_number', read_only=True)

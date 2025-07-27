@@ -6,3 +6,9 @@ b = """+372(29) 2658740"""
 
 print( ''.join(re.findall(r"\d+", a)))
 print( ''.join(re.findall(r"\d+", b)))
+
+from mimesis import Person
+
+p = Person()
+print( p.first_name())
+print( p.username())

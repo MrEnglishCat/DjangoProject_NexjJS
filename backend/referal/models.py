@@ -52,9 +52,9 @@ class AuthSessionModel(models.Model):
 
 
 class InviteCodeModel(models.Model):
-    invite_code = models.CharField(max_length=10, unique=True, verbose_name="Инвайт-код")
+    invite_code = models.CharField(max_length=6, unique=True, verbose_name="Инвайт-код")
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='own_invite_code',
-                               verbose_name="Пользователь" )
+                               verbose_name="Пользователь", null=True)
     is_active = models.BooleanField(default=True, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")

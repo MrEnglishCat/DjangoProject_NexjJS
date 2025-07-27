@@ -4,13 +4,15 @@ from datetime import datetime, UTC
 
 from django.db import IntegrityError
 from django.shortcuts import render
+from mimesis import Person
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response  # Не забудьте импортировать Response
 
 from referal.models import AuthSessionModel, UserModel, InviteCodeModel, InviteCodeUsageModel
-from referal.serializers import UserProfileSerializer, InviteCodeSerializer, InviteCodeUsageSerializer
+from referal.serializers import UserProfileSerializer, InviteCodeSerializer, InviteCodeUsageSerializer, \
+    ActivateInviteCodeSerializer
 
 
 class InviteCodeView(APIView):
@@ -70,10 +72,16 @@ class VerifyCodeView(APIView):
         if auth_code_from_db and user_auth_code == auth_code_from_db.code:
             auth_code_from_db.is_used = True
             invite_code = InviteCodeModel.generate_unique_code()
-            user, create = UserModel.objects.get_or_create(phone_number=phone_number)
+
+
+            person = Person()
+            user, create = UserModel.objects.get_or_create(
+                phone_number=phone_number,
+                first_name= person.first_name(),
+            )
             if not (InviteCodeModel.objects.filter(user_id=user.id, is_active=True)):
                 try:
-                    _invite_code_obj, create = InviteCodeModel.objects.get_or_create(code=invite_code, user_id=user.id,
+                    _invite_code_obj, create = InviteCodeModel.objects.get_or_create(invite_code=invite_code, user_id=user.id,
                                                                                      is_active=True)
                     InviteCodeUsageModel.objects.get_or_create(invite_code=_invite_code_obj, user_id=user.id)
                 except IntegrityError:
@@ -114,3 +122,37 @@ class UserProfileView(APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class ActivateInviteCodeView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        invite_code_obj = ActivateInviteCodeSerializer(
+            data=request.data
+        )
+        if invite_code_obj.is_valid():
+            _invite_code_model = invite_code_obj.data
+            # invite_code_db = InviteCodeModel.objects.get(invite_code=_invite_code)
+
+            return Response({
+                "success": True,
+                "message": "Инвайт код активирован!"
+            })
+
+
+        else:
+            return Response({
+                "success": False,
+                "message": "Переданы невалидные данные!",
+                "errors": invite_code_obj.errors
+
+            }, status=400)
+
+
+class GenerateInviteCodeView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        ...
+        return Response({})
