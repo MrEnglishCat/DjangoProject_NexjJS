@@ -12,3 +12,5 @@ from mimesis import Person
 p = Person()
 print( p.first_name())
 print( p.username())
+print( p.email())
+print( p.last_name())

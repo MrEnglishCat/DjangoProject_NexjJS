@@ -7,8 +7,10 @@ import string
 
 class UserModel(models.Model):
     phone_number = models.CharField(max_length=20, unique=True, verbose_name="Номер телефона")
-    username = models.CharField(max_length=30, verbose_name="Username")
-    first_name = models.CharField(max_length=50, verbose_name="Имя")
+    username = models.CharField(max_length=30, verbose_name="Username", null=True)
+    first_name = models.CharField(max_length=50, verbose_name="Имя", null=True)
+    last_name = models.CharField(max_length=50, verbose_name="Фамилия", null=True)
+    email = models.EmailField(max_length=50, verbose_name="Email", null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 

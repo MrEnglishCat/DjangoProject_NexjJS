@@ -21,10 +21,18 @@ class UserProfileSerializer(ModelSerializer):
 
     class Meta:
         model = UserModel
-        fields = ["id", "phone_number", "username", "first_name", "invite_code", "invite_codes"]
+        fields = ["id", "phone_number", "username", "first_name", "last_name", "email", "invite_code", "invite_codes"]
+
+class UserProfileEditSerializer(ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ["id", "phone_number", "username", "first_name", "last_name", "email"]
 
 
 class InviteCodeSerializer(ModelSerializer):
+
+    created_at = serializers.DateTimeField(read_only=True, format="%d.%m.%Y %H:%M:%S")
+    created_at = serializers.DateTimeField(read_only=True, format="%d.%m.%Y %H:%M:%S")
 
     class Meta:
         model = InviteCodeModel

@@ -3,16 +3,16 @@ import time
 from datetime import datetime, UTC
 
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from mimesis import Person
 from rest_framework import status
+from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response  # Не забудьте импортировать Response
-
 from referal.models import AuthSessionModel, UserModel, InviteCodeModel, InviteCodeUsageModel
 from referal.serializers import UserProfileSerializer, InviteCodeSerializer, InviteCodeUsageSerializer, \
-    ActivateInviteCodeSerializer
+    ActivateInviteCodeSerializer, UserProfileEditSerializer
 
 
 class InviteCodeView(APIView):
@@ -73,19 +73,25 @@ class VerifyCodeView(APIView):
             auth_code_from_db.is_used = True
             invite_code = InviteCodeModel.generate_unique_code()
 
-
             person = Person()
-            user, create = UserModel.objects.get_or_create(
-                phone_number=phone_number,
-                first_name= person.first_name(),
-            )
+            try:
+                user, create = UserModel.objects.get_or_create(
+                    phone_number=phone_number,
+                    first_name=person.first_name(),
+                    username=person.username(),
+                    email=person.email(),
+                )
+            except IntegrityError:
+                user = UserModel.objects.get(phone_number=phone_number)
+
             if not (InviteCodeModel.objects.filter(user_id=user.id, is_active=True)):
                 try:
-                    _invite_code_obj, create = InviteCodeModel.objects.get_or_create(invite_code=invite_code, user_id=user.id,
+                    _invite_code_obj, create = InviteCodeModel.objects.get_or_create(invite_code=invite_code,
+                                                                                     user_id=user.id,
                                                                                      is_active=True)
                     InviteCodeUsageModel.objects.get_or_create(invite_code=_invite_code_obj, user_id=user.id)
                 except IntegrityError:
-                    _invite_code = InviteCodeModel.objects.get(user_id=user.id, )
+                    _invite_code = InviteCodeModel.objects.get(user_id=user.id, is_active=True)
 
             auth_code_from_db.save()
 
@@ -122,6 +128,14 @@ class UserProfileView(APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class UserProfileEditView(UpdateAPIView):
+    permission_classes = [AllowAny]
+
+    queryset = UserModel.objects.all()
+    # serializer_class = UserProfileSerializer
+    serializer_class = UserProfileEditSerializer
 
 
 class ActivateInviteCodeView(APIView):
