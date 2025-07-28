@@ -74,14 +74,15 @@ class ActivateInviteCodeSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Нельзя повторно активировать свой собственный код!")
             elif _invite_code_obj.user and _invite_code_obj.user.id != user_id:
                 user_instance = UserModel.objects.get(id=user_id)
-                invite_obj = InviteCodeUsageModel.objects.get_or_create(
+                invite_obj, create = InviteCodeUsageModel.objects.get_or_create(
                     invite_code=_invite_code_obj,
                     user=user_instance,
                 )
 
-                print(invite_obj)
+                invite_obj.is_revoked = True
+                invite_obj.save()
 
-                raise serializers.ValidationError("Попытка активации чужого инвайт-кода! Данные сохранены!")
+                # raise serializers.ValidationError("Попытка активации чужого инвайт-кода! Данные сохранены!")
         except InviteCodeModel.DoesNotExist:
             ...
 

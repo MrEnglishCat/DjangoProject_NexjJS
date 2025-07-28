@@ -143,16 +143,27 @@ class ActivateInviteCodeView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+
         invite_code_obj = ActivateInviteCodeSerializer(
-            data=request.data
+            data=request.data,
         )
+
         if invite_code_obj.is_valid():
-            _invite_code_model = invite_code_obj.data
-            # invite_code_db = InviteCodeModel.objects.get(invite_code=_invite_code)
-            # TODO дописать метод активации
+            _old_invite_code = InviteCodeModel.objects.get(user=invite_code_obj.data.get("user_id"), is_active=True)
+            _old_invite_code.is_active = False
+            _old_invite_code.save()
+
+            invite_code_db = InviteCodeModel.objects.get(invite_code=invite_code_obj.data.get("invite_code"))
+            invite_code_db.is_used = True
+            invite_code_db.user_id = invite_code_obj.data.get("user_id")
+            invite_code_db.save()
+
+            _invite_codes = InviteCodeModel.objects.filter(user=invite_code_obj.data.get("user_id"))
             return Response({
                 "success": True,
-                "message": "Инвайт код активирован!"
+                "message": "Инвайт код активирован!",
+                "invite_code": InviteCodeSerializer(invite_code_db).data,
+                "invite_codes": InviteCodeSerializer(_invite_codes, many=True).data,
             })
 
 
@@ -213,14 +224,10 @@ class GenerateInviteCodeView(ViewSet):
                 "success": False,
                 "message": "Переданный код не найден!"
             },
-            status=status.HTTP_404_NOT_FOUND)
+                status=status.HTTP_404_NOT_FOUND)
         return Response({
             "success": True,
             "message": "Код удален!"
 
         },
-        status=status.HTTP_200_OK)
-
-
-
-
+            status=status.HTTP_200_OK)
