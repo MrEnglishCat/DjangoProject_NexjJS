@@ -3,12 +3,13 @@ import time
 from datetime import datetime, UTC
 
 from django.db import IntegrityError
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from mimesis import Person
 from rest_framework import status
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response  # Не забудьте импортировать Response
 from referal.models import AuthSessionModel, UserModel, InviteCodeModel, InviteCodeUsageModel
 from referal.serializers import UserProfileSerializer, InviteCodeSerializer, InviteCodeUsageSerializer, \
@@ -148,7 +149,7 @@ class ActivateInviteCodeView(APIView):
         if invite_code_obj.is_valid():
             _invite_code_model = invite_code_obj.data
             # invite_code_db = InviteCodeModel.objects.get(invite_code=_invite_code)
-
+            # TODO дописать метод активации
             return Response({
                 "success": True,
                 "message": "Инвайт код активирован!"
@@ -164,9 +165,45 @@ class ActivateInviteCodeView(APIView):
             }, status=400)
 
 
-class GenerateInviteCodeView(APIView):
+class GenerateInviteCodeView(ViewSet):
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        ...
-        return Response({})
+    def create(self, request):
+        # Логика для POST /generate_invite/
+        # Создание нового инвайт-кода
+
+
+        print(request.data)
+
+        new_invite_code = InviteCodeModel.generate_unique_code()
+        _invite_code_obj = InviteCodeModel(invite_code=new_invite_code, is_active=False)
+        print(new_invite_code)
+        return Response({
+            "success": True,
+            "message": "Инвайт-код сгенерирован",
+            "invite_code": new_invite_code
+        })
+
+    def list(self, request):
+        # Логика для GET /generate_invite/
+        # Получение списка всех инвайт-кодов (если нужно)
+        _invite_codes = InviteCodeModel.objects.filter(is_active=False, user_id=None)
+        return Response({
+            "success": True,
+            "message": "Инвайт-коды загружены",
+            "invite_codes": InviteCodeSerializer(_invite_codes, many=True).data
+        })
+
+    def retrieve(self, request, pk=None):
+        # Логика для GET /generate_invite/{pk}/
+        # Получение конкретного инвайт-кода по ID
+        pass
+
+    def destroy(self, request, pk=None):
+        # Логика для DELETE /generate_invite/{pk}/
+        # Удаление конкретного инвайт-кода по ID
+        pass
+
+
+
+

@@ -49,7 +49,7 @@ class ActivateInviteCodeSerializer(serializers.Serializer):
             print("serializer", _invite_code_obj)
             return value
         except InviteCodeModel.DoesNotExist:
-            raise serializers.ValidationError("Неверный инвайт код!")
+            raise serializers.ValidationError("Неверный инвайт код! Его не существует!")
 
     def validate_user_id(self, value):
         try:
