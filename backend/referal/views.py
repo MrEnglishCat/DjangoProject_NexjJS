@@ -231,7 +231,18 @@ class GenerateInviteCodeView(ViewSet):
         })
 
     def retrieve(self, request, pk=None):
-        pass
+        """
+            Метод не понадобился. Метод получает один инвайт-код по его id. Проверок не делал.
+        :param request:
+        :param pk:
+        :return:
+        """
+        invite_code_obj = InviteCodeModel.objects.get(id=pk)
+        return Response({
+            "success": True,
+            "message": "Инвайт код найден!",
+            "invite_code": InviteCodeSerializer(invite_code_obj).data
+        })
 
     def destroy(self, request, pk=None):
         """
