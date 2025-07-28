@@ -40,9 +40,10 @@
     *   macOS/Linux: `source venv/bin/activate`
 4.  Установите зависимости: `pip install -r requirements.txt`
 5.  Перейдите в директорию `backend`
-6.  Примените миграции: `python manage.py migrate`
-7.  Создайте суперпользователя (опционально): `python manage.py createsuperuser`
-8.  Запустите сервер разработки: `python manage.py runserver`
+6.  Создание миграций: `python manage.py makemigrations`
+7.  Примените миграции: `python manage.py migrate`
+8.  Создайте суперпользователя (опционально): `python manage.py createsuperuser`
+9.  Запустите сервер разработки: `python manage.py runserver`
 
 ### Фронтенд (Next.js)
 
@@ -79,6 +80,7 @@ http://127.0.0.1:8000/api/v1/
 - `200 OK` - Код успешно отправлен
 ```json
 {
+  "success": true,
   "message": "Код авторизации отправлен",
   "phone_number": "+79991234567"
 }
@@ -105,9 +107,10 @@ http://127.0.0.1:8000/api/v1/
 - `200 OK` - Авторизация успешна
 ```json
 {
+  "success": true,
   "message": "Авторизация успешна",
   "phone_number": "+79991234567",
-  "is_new_user": false
+  
 }
 ```
 - `400 Bad Request` - Неверный код или истек срок действия
@@ -127,22 +130,48 @@ http://127.0.0.1:8000/api/v1/
 - `200 OK` - Профиль успешно получен
 ```json
 {
-  "success": true,
-  "user": {
-    "id": 1,
-    "phone_number": "+79991234567",
-    "username": "user123",
-    "first_name": "Иван",
-    "invite_code": "aBc123"
-  },
-  "invite_codes": [
-    {
-      "invite_code": "xYz789",
-      "is_revoked": false,
-      "used_at": "2023-01-01T12:00:00Z",
-      "user_phone_number": "+79997654321"
-    }
-  ]
+    "success": true,
+    "user": {
+        "id": 33,
+        "phone_number": "72222232222",
+        "username": "",
+        "first_name": "",
+        "invite_code": {
+            "invite_code": "bFzqHU",
+            "is_active": true,
+            "user": 33,
+            "created_at": "2025-07-26T17:08:29.472636Z",
+            "updated_at": "2025-07-26T17:08:29.472636Z"
+        },
+        "invite_codes": [
+            {
+                "invite_code": "pGiDGu",
+                "is_active": false,
+                "user": 33,
+                "created_at": "2025-07-26T16:30:03.580173Z",
+                "updated_at": "2025-07-26T16:30:03.580173Z"
+            },
+            {
+                "invite_code": "ipS1M2",
+                "is_active": false,
+                "user": 33,
+                "created_at": "2025-07-26T16:56:36.414382Z",
+                "updated_at": "2025-07-26T16:56:36.414382Z"
+            }
+        ]
+    },
+    "invite_codes_usage": [
+        {
+            "user_phone_number": "72222232222",
+            "used_at": "2025-07-26T17:08:29.481268Z",
+            "is_revoked": false
+        },
+        {
+            "user_phone_number": "77222223222",
+            "used_at": "2025-07-26T18:00:34.186000Z",
+            "is_revoked": false
+        }
+    ]
 }
 ```
 - `404 Not Found` - Пользователь не найден
@@ -167,8 +196,45 @@ http://127.0.0.1:8000/api/v1/
 - `200 OK` - Инвайт-код успешно активирован
 ```json
 {
-  "success": true,
-  "message": "Инвайт код активирован!"
+    "success": true,
+    "message": "Инвайт код активирован!",
+    "invite_code": {
+        "invite_code": "12a02P",
+        "is_active": true,
+        "user": 33,
+        "created_at": "26.07.2025 18:00:34",
+        "updated_at": "28.07.2025 03:13:01"
+    },
+    "invite_codes": [
+        {
+            "invite_code": "pGiDGu",
+            "is_active": false,
+            "user": 33,
+            "created_at": "26.07.2025 16:30:03",
+            "updated_at": "26.07.2025 16:30:03"
+        },
+        {
+            "invite_code": "ipS1M2",
+            "is_active": false,
+            "user": 33,
+            "created_at": "26.07.2025 16:56:36",
+            "updated_at": "26.07.2025 16:56:36"
+        },
+        {
+            "invite_code": "bFzqHU",
+            "is_active": false,
+            "user": 33,
+            "created_at": "26.07.2025 17:08:29",
+            "updated_at": "28.07.2025 03:13:01"
+        },
+        {
+            "invite_code": "12a02P",
+            "is_active": true,
+            "user": 33,
+            "created_at": "26.07.2025 18:00:34",
+            "updated_at": "28.07.2025 03:13:01"
+        }
+    ]
 }
 ```
 - `400 Bad Request` - Неверные данные или код уже активирован
@@ -206,3 +272,18 @@ http://127.0.0.1:8000/api/v1/
 ````
 
 Этот `README.md` включает описание проекта, технологии, инструкции по установке, описание API и краткие указания по развертыванию на PythonAnywhere. Вы можете адаптировать пути, имена и детали под вашу конкретную структуру проекта.
+
+````
+
+### PS На гит закинута тестовая БД SQlite3. 
+Для ее использования в настройках проекта backend/backend файл settings.py - нужно раскомментировать строки:
+```
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db.sqlite3',
+     }
+ }
+```
+
+Закоментировать настройки для Postgres.
