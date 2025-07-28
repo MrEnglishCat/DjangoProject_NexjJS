@@ -20,7 +20,11 @@ class InviteCodeView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        # Response должен возвращать словарь, а не просто строку
+        """
+        Запрос на формирование инвайт кода
+        :param request:
+        :return:
+        """
         return Response({"success": True, "message": "Запрос на формирование инвайт кода получен"})
 
 
@@ -29,15 +33,14 @@ class RequestCodeView(APIView):
 
     def post(self, request):
         """
-            Нужно получить номер,
-            Сформировать 4х значиный код через таблицу сессий AuthSessionModel - имитация сессий
-            Отправить пользователю этот код
+            Получение 4х значного кода авторизации
+            Сохранение его в таблице сессий.
+            Отправка этого кода пользователю
         :param request:
         :return:
         """
 
         phone_number = ''.join(re.findall(r"\d+", request.data.get('phone_number', '')))
-        print("phone_number", phone_number)
         if not phone_number:
             return Response({"success": False, "message": "Не передан номер телефона!"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -60,6 +63,12 @@ class VerifyCodeView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+            Верификация введенного пользователем кода.
+            Выдача данных профиля для отображению фронтенда
+        :param request:
+        :return:
+        """
         phone_number = ''.join(re.findall(r"\d+", request.data.get('phone_number', '')))
         user_auth_code = request.data.get('auth_code')
         time.sleep(1.5)
@@ -111,6 +120,12 @@ class UserProfileView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, phone_number=None):
+        """
+            Получение информации о профайле
+        :param request:
+        :param phone_number:
+        :return:
+        """
         if not phone_number or not phone_number.isdigit():
             return Response({"success": False, "message": "Номер телефона не передан или у номера неверный формат!"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -132,6 +147,9 @@ class UserProfileView(APIView):
 
 
 class UserProfileEditView(UpdateAPIView):
+    """
+    Работа с редактированием профиля
+    """
     permission_classes = [AllowAny]
 
     queryset = UserModel.objects.all()
@@ -139,11 +157,16 @@ class UserProfileEditView(UpdateAPIView):
     serializer_class = UserProfileEditSerializer
 
 
+
 class ActivateInviteCodeView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-
+        """
+            Активация нового инвайт кода, которого не было у пользователя.
+        :param request:
+        :return:
+        """
         invite_code_obj = ActivateInviteCodeSerializer(
             data=request.data,
         )
@@ -180,6 +203,11 @@ class GenerateInviteCodeView(ViewSet):
     permission_classes = [AllowAny]
 
     def create(self, request):
+        """
+         Генерация нового инвайт-кода, не привязанного к пользователю
+        :param request:
+        :return:
+        """
         if request.data:
             return Response({
                 "success": False,
@@ -195,6 +223,11 @@ class GenerateInviteCodeView(ViewSet):
         })
 
     def list(self, request):
+        """
+        Получение списка инвайт-кодов не привязанных к пользователям.
+        :param request:
+        :return:
+        """
         if request.data:
             return Response({
                 "success": False,
@@ -211,6 +244,12 @@ class GenerateInviteCodeView(ViewSet):
         pass
 
     def destroy(self, request, pk=None):
+        """
+            Удаление инвайт-кода не привязанного к пользователю
+        :param request:
+        :param pk:
+        :return:
+        """
         if request.data:
             return Response({
                 "success": False,
