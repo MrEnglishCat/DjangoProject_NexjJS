@@ -16,16 +16,6 @@ from referal.serializers import UserProfileSerializer, InviteCodeSerializer, Inv
     ActivateInviteCodeSerializer, UserProfileEditSerializer
 
 
-class InviteCodeView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        """
-        Запрос на формирование инвайт кода
-        :param request:
-        :return:
-        """
-        return Response({"success": True, "message": "Запрос на формирование инвайт кода получен"})
 
 
 class RequestCodeView(APIView):
