@@ -32,7 +32,7 @@ class UserProfileEditSerializer(ModelSerializer):
 class InviteCodeSerializer(ModelSerializer):
 
     created_at = serializers.DateTimeField(read_only=True, format="%d.%m.%Y %H:%M:%S")
-    created_at = serializers.DateTimeField(read_only=True, format="%d.%m.%Y %H:%M:%S")
+    updated_at = serializers.DateTimeField(read_only=True, format="%d.%m.%Y %H:%M:%S")
 
     class Meta:
         model = InviteCodeModel

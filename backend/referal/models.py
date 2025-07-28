@@ -76,7 +76,7 @@ class InviteCodeModel(models.Model):
                 return invite_code
 
     def __str__(self):
-        return f"{self.invite_code} ({self.user.phone_number})"
+        return f"{self.invite_code} ({self.user.phone_number if self.user else 'null'})"
 
     class Meta:
         verbose_name = "Инвайт-код"

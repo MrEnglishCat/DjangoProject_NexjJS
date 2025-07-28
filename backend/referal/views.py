@@ -169,15 +169,14 @@ class GenerateInviteCodeView(ViewSet):
     permission_classes = [AllowAny]
 
     def create(self, request):
-        # Логика для POST /generate_invite/
-        # Создание нового инвайт-кода
-
-
-        print(request.data)
-
+        if request.data:
+            return Response({
+                "success": False,
+                "message": "В теле запроса ничего не нужно передавать!"
+            })
         new_invite_code = InviteCodeModel.generate_unique_code()
         _invite_code_obj = InviteCodeModel(invite_code=new_invite_code, is_active=False)
-        print(new_invite_code)
+        _invite_code_obj.save()
         return Response({
             "success": True,
             "message": "Инвайт-код сгенерирован",
@@ -185,8 +184,11 @@ class GenerateInviteCodeView(ViewSet):
         })
 
     def list(self, request):
-        # Логика для GET /generate_invite/
-        # Получение списка всех инвайт-кодов (если нужно)
+        if request.data:
+            return Response({
+                "success": False,
+                "message": "В теле запроса ничего не нужно передавать!"
+            })
         _invite_codes = InviteCodeModel.objects.filter(is_active=False, user_id=None)
         return Response({
             "success": True,
@@ -200,9 +202,26 @@ class GenerateInviteCodeView(ViewSet):
         pass
 
     def destroy(self, request, pk=None):
-        # Логика для DELETE /generate_invite/{pk}/
-        # Удаление конкретного инвайт-кода по ID
-        pass
+        if request.data:
+            return Response({
+                "success": False,
+                "message": "В теле запроса ничего не нужно передавать!"
+            })
+        try:
+            _invite_code_obj = InviteCodeModel.objects.filter(invite_code=pk)
+            _invite_code_obj.delete()
+        except InviteCodeModel.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": "Переданный код не найден!"
+            },
+            status=status.HTTP_404_NOT_FOUND)
+        return Response({
+            "success": True,
+            "message": "Код удален!"
+
+        },
+        status=status.HTTP_200_OK)
 
 
 
