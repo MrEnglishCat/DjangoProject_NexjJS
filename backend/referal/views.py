@@ -197,8 +197,6 @@ class GenerateInviteCodeView(ViewSet):
         })
 
     def retrieve(self, request, pk=None):
-        # Логика для GET /generate_invite/{pk}/
-        # Получение конкретного инвайт-кода по ID
         pass
 
     def destroy(self, request, pk=None):
